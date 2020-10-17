@@ -9,17 +9,28 @@
 import UIKit
 
 final class Coordinator {
+    //MARK: - Init
 
     private let window: UIWindow
+    private var navigationController: UINavigationController?
 
     init(window: UIWindow) {
         self.window = window
     }
 
+    //MARK: - Coordinator Methods
     func start() {
-        let viewController = UIViewController()
+        let movieListviewController = MovieListViewController(dataProvider: DataProvider(), didSelectMovie: didSelectMovie)
+        let navigationController = UINavigationController(rootViewController: movieListviewController)
+        self.navigationController = navigationController
 
-        window.rootViewController = viewController
+
+        window.rootViewController = navigationController
         window.makeKeyAndVisible()
+    }
+
+    private func didSelectMovie(_ movie: Movie) {
+        let movieDetailViewController = MovieDetailViewController(movie: movie)
+        navigationController?.pushViewController(movieDetailViewController, animated: true)
     }
 }
