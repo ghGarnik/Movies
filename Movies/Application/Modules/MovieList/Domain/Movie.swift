@@ -9,15 +9,19 @@
 import Foundation
 
 struct Movie {
+    let id: Int
     let title: String?
-    let year: Int
-    let rate: Int
+    let posterUrl: URL?
+    let year: String?
+    let rate: Double
     let genre: String?
     let budget: Double?
     let overview: String?
 
-    init(title: String? = nil, year: Int, rate: Int, genre: String? = nil, budget: Double? = nil, overview: String? = nil) {
+    init(id: Int, title: String? = nil, posterUrl: URL?, year: String?, rate: Double, genre: String? = nil, budget: Double? = nil, overview: String? = nil) {
+        self.id = id
         self.title = title
+        self.posterUrl = posterUrl
         self.year = year
         self.rate = rate
         self.genre = genre

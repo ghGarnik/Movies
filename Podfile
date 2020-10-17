@@ -17,3 +17,9 @@ target 'Movies' do
   end
 
 end
+
+plugin 'cocoapods-keys', {
+  :project => "Movies",
+  :keys => [
+    "apiKey"
+  ]}

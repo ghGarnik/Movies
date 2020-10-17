@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class MovieCell: UITableViewCell {
     static let reuseIdentifier = "movieCell"
@@ -44,9 +45,9 @@ final class MovieCell: UITableViewCell {
     }
 
     func configureCell(movie: Movie) {
-        coverImageView.image = UIImage(named: "donnie")
+        coverImageView.kf.setImage(with: movie.posterUrl)
         nameLabel.text = movie.title
-        yearLabel.text = String(movie.year)
+        yearLabel.text = movie.year
         ratingLabel.text = String(movie.rate)+(" %")
     }
 
@@ -74,23 +75,17 @@ final class MovieCell: UITableViewCell {
                                                                            views: views)
         constraints += subtitleHorizontalConstraints
 
-        let yearLabelVerticalConstraints = NSLayoutConstraint.constraints(withVisualFormat: "V:[yearLabel]-16-|",
+        let yearLabelVerticalConstraints = NSLayoutConstraint.constraints(withVisualFormat: "V:[nameLabel]-16-[yearLabel]-16-|",
                                                                           options: [],
                                                                           metrics: nil,
                                                                           views: views)
         constraints += yearLabelVerticalConstraints
 
-        let nameLabelXCenterConstraint = NSLayoutConstraint.constraints(withVisualFormat: "H:[coverImageView]-(<=1)-[nameLabel]",
-                                                                        options: [.alignAllCenterY],
+        let nameLabelXCenterConstraint = NSLayoutConstraint.constraints(withVisualFormat: "H:|-[nameLabel]-|",
+                                                                        options: [],
                                                                         metrics: nil,
                                                                         views: views)
         constraints += nameLabelXCenterConstraint
-
-        let nameLabelYCenterConstraint = NSLayoutConstraint.constraints(withVisualFormat: "V:[coverImageView]-(<=1)-[nameLabel]",
-                                                                        options: [.alignAllCenterX],
-                                                                        metrics: nil,
-                                                                        views: views)
-        constraints += nameLabelYCenterConstraint
 
 
         let coverImageViewHorizontalConstraints = NSLayoutConstraint.constraints(withVisualFormat: "H:|-[coverImageView]-|",
@@ -118,11 +113,12 @@ final class MovieCell: UITableViewCell {
         coverImageView.contentMode = .scaleAspectFill
         coverImageView.clipsToBounds = true
         
-        nameLabel.backgroundColor = .white
+        nameLabel.backgroundColor = UIColor.white.withAlphaComponent(0.7)
         nameLabel.textColor = .black
         nameLabel.font = .systemFont(ofSize: 24, weight: .bold)
         nameLabel.textAlignment = .center
         nameLabel.numberOfLines = 2
+        nameLabel.sizeToFit()
         
         yearLabel.backgroundColor = .white
         yearLabel.textColor = .black
@@ -130,7 +126,7 @@ final class MovieCell: UITableViewCell {
         yearLabel.textAlignment = .left
         yearLabel.sizeToFit()
         
-        ratingLabel.backgroundColor = .white
+        ratingLabel.backgroundColor = .yellow
         ratingLabel.textColor = .black
         ratingLabel.font = .systemFont(ofSize: 18, weight: .heavy)
         ratingLabel.textAlignment = .right

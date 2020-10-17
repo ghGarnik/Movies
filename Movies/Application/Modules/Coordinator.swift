@@ -33,7 +33,10 @@ final class Coordinator {
     }
 
     private func initialViewController() -> UIViewController {
-        let movieListViewModel = MovieListViewModel(repository: DataProvider(), selectedMovieRelay: didSelectMovie)
+        let service = MovieListService(apiClient: APIClient())
+        let dataProvider = DataProvider(service: service)
+
+        let movieListViewModel = MovieListViewModel(repository: dataProvider, selectedMovieRelay: didSelectMovie)
         let movieListViewController = MovieListViewController(viewModel: movieListViewModel)
         subscribeToMovieSelection()
         return movieListViewController

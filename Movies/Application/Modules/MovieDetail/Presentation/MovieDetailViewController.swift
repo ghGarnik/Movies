@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class MovieDetailViewController: UIViewController {
     //MARK: - Subviews
@@ -51,10 +52,10 @@ final class MovieDetailViewController: UIViewController {
     }
 
     private func fillMovie() {
-        imageHeaderView.image = UIImage(named: "donnie")
+        imageHeaderView.kf.setImage(with: movie.posterUrl)
         nameLabel.text = movie.title
         ratingLabel.text = String(movie.rate)+(" %")
-        yearLabel.text = String(movie.year)
+        yearLabel.text = movie.year
         genreLabel.text = movie.genre
 
         let formatter = NumberFormatter()
