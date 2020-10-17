@@ -8,6 +8,7 @@ target 'Movies' do
 
   pod 'Kingfisher', '~> 5.0'
   pod 'RxAlamofire', '~> 5.6.2'
+  pod 'RxCocoa', '~> 5.1.1'
   pod 'RxSwift', '~> 5.1.1'
 
   target 'MoviesTests' do
