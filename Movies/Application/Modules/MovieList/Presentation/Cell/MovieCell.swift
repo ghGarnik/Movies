@@ -32,7 +32,7 @@ final class MovieCell: UITableViewCell {
 
         setupViewsDictionary()
         applyStyle()
-        setupView()
+        setupViewConstraints()
     }
 
     override func prepareForReuse() {
@@ -59,7 +59,7 @@ final class MovieCell: UITableViewCell {
                  "coverImageView": coverImageView]
     }
 
-    private func setupView() {
+    private func setupViewConstraints() {
         self.addSubViewWithoutConstraints(coverImageView)
         self.addSubViewWithoutConstraints(nameLabel)
         self.addSubViewWithoutConstraints(yearLabel)
@@ -113,6 +113,8 @@ final class MovieCell: UITableViewCell {
      //MARK: - View Style
 
     private func applyStyle() {
+        self.selectionStyle = .none
+        
         coverImageView.contentMode = .scaleAspectFill
         coverImageView.clipsToBounds = true
         

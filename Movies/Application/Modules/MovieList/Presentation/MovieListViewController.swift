@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class MovieListViewController: UIViewController {
     //MARK: - Subviews
@@ -16,19 +18,12 @@ final class MovieListViewController: UIViewController {
     private var views = [String: UIView]()
 
     //MARK: - Init
-    
-    private let dataProvider: DataProvider
-    private let didSelectMovie: (Movie) -> Void
 
-    private var movies = [Movie]() {
-        didSet {
-            movieListTableView.reloadData()
-        }
-    }
+    private let disposeBag = DisposeBag()
+    private let viewModel: MovieListViewModelProtocol
 
-    init(dataProvider: DataProvider, didSelectMovie: @escaping (Movie) -> Void) {
-        self.dataProvider = dataProvider
-        self.didSelectMovie = didSelectMovie
+    init(viewModel: MovieListViewModelProtocol) {
+        self.viewModel = viewModel
 
         super.init(nibName: nil, bundle: nil)
 
@@ -46,16 +41,29 @@ final class MovieListViewController: UIViewController {
         super.viewDidLoad()
         setupTableView()
         setupViewConstraints()
-        movies = dataProvider.getMovies()
+        setupBindings()
     }
 
     private func setupTableView() {
-        movieListTableView.dataSource = self
-        movieListTableView.delegate = self
-
+        movieListTableView.rowHeight = 200.0
         movieListTableView.separatorStyle = .none
-
         movieListTableView.register(MovieCell.self, forCellReuseIdentifier: MovieCell.reuseIdentifier)
+    }
+
+    private func setupBindings() {
+        viewModel.title
+            .drive(rx.title)
+            .disposed(by: disposeBag)
+
+        viewModel.movies
+            .drive(movieListTableView.rx.items(cellIdentifier: MovieCell.reuseIdentifier, cellType: MovieCell.self)) {_, movie, cell in
+                cell.configureCell(movie: movie)
+            }
+            .disposed(by: disposeBag)
+
+        movieListTableView.rx.modelSelected(Movie.self)
+            .bind(to: viewModel.didSelectMovie)
+            .disposed(by: disposeBag)
     }
 
     //MARK: - VLF methods
@@ -81,38 +89,6 @@ final class MovieListViewController: UIViewController {
                                                                           views: views)
         constraints += tableViewVerticalConstraints
 
-
         NSLayoutConstraint.activate(constraints)
-    }
-}
-
-//MARK: - TableView
-
-extension MovieListViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        movies.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let movieCell = tableView.dequeueReusableCell(withIdentifier: MovieCell.reuseIdentifier, for: indexPath) as? MovieCell,
-            movies.indices.contains(indexPath.row) else {
-                return UITableViewCell()
-        }
-        movieCell.configureCell(movie: movies[indexPath.row])
-        return movieCell
-    }
-}
-
-extension MovieListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 400.0
-    }
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        defer {
-            tableView.deselectRow(at: indexPath, animated: true)
-        }
-        guard movies.indices.contains(indexPath.row) else { return }
-        didSelectMovie(movies[indexPath.row])
     }
 }

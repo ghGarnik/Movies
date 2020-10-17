@@ -7,12 +7,17 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class Coordinator {
     //MARK: - Init
 
     private let window: UIWindow
     private var navigationController: UINavigationController?
+    
+    private let didSelectMovie = PublishRelay<Movie>()
+    private let disposeBag = DisposeBag()
 
     init(window: UIWindow) {
         self.window = window
@@ -20,17 +25,28 @@ final class Coordinator {
 
     //MARK: - Coordinator Methods
     func start() {
-        let movieListviewController = MovieListViewController(dataProvider: DataProvider(), didSelectMovie: didSelectMovie)
-        let navigationController = UINavigationController(rootViewController: movieListviewController)
+        let navigationController = UINavigationController(rootViewController: initialViewController())
         self.navigationController = navigationController
-
 
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
     }
 
-    private func didSelectMovie(_ movie: Movie) {
-        let movieDetailViewController = MovieDetailViewController(movie: movie)
-        navigationController?.pushViewController(movieDetailViewController, animated: true)
+    private func initialViewController() -> UIViewController {
+        let movieListViewModel = MovieListViewModel(repository: DataProvider(), selectedMovieRelay: didSelectMovie)
+        let movieListViewController = MovieListViewController(viewModel: movieListViewModel)
+        subscribeToMovieSelection()
+        return movieListViewController
+
+    }
+
+    private func subscribeToMovieSelection() {
+        didSelectMovie
+            .subscribe(onNext: { [weak self] movie in
+                guard let self = self else { return }
+                let movieDetailViewController = MovieDetailViewController(movie: movie)
+                self.navigationController?.pushViewController(movieDetailViewController, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
 }
