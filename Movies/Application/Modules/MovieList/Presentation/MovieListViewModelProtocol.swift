@@ -9,8 +9,8 @@
 import RxCocoa
 
 protocol MovieListViewModelProtocol {
-    var title: Driver<String> { get }
     func viewDidLoad()
+    func refreshMovies()
     var movies: Driver<[Movie]> { get }
     func loadNextPage()
     var didSelectMovie: PublishRelay<Movie> { get }

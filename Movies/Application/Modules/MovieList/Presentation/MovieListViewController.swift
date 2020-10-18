@@ -50,16 +50,23 @@ final class MovieListViewController: UIViewController {
         movieListTableView.rowHeight = 200.0
         movieListTableView.separatorStyle = .none
         movieListTableView.register(MovieCell.self, forCellReuseIdentifier: MovieCell.reuseIdentifier)
+
+        let refreshControl = UIRefreshControl()
+        refreshControl.attributedTitle = NSAttributedString(string: "Refreshing awesome movies")
+        refreshControl.addTarget(self, action: #selector(refreshTable), for: .valueChanged)
+        
+        movieListTableView.refreshControl = refreshControl
+    }
+
+    @objc private func refreshTable() {
+        viewModel.refreshMovies()
     }
 
     //MARK: - RxCocoa Bindings
 
     private func setupBindings() {
-        viewModel.title
-            .drive(rx.title)
-            .disposed(by: disposeBag)
-
         viewModel.movies
+            .do(onNext: { [weak self] _ in self?.movieListTableView.refreshControl?.endRefreshing() })
             .drive(movieListTableView.rx.items(cellIdentifier: MovieCell.reuseIdentifier, cellType: MovieCell.self)) {_, movie, cell in
                 cell.configureCell(movie: movie)
             }

@@ -13,8 +13,22 @@ struct MovieListSearchState {
     var searchText: String
     var currentPage: Int = 0
     var maximumPages: Int = 1
-
+    
     init(searchText: String) {
         self.searchText = searchText
+    }
+    
+    func resetingState() -> MovieListSearchState {
+        var state = self
+        state.currentMovieList = []
+        state.currentPage = 0
+        state.maximumPages = 1
+        return state
+    }
+    
+    func appendingMovies(from state: MovieListSearchState) -> MovieListSearchState {
+        var newState = self
+        newState.currentMovieList = state.currentMovieList + self.currentMovieList
+        return newState
     }
 }

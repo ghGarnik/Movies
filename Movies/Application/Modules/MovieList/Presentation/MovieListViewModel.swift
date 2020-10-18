@@ -32,12 +32,12 @@ class MovieListViewModel {
 }
 
 extension MovieListViewModel: MovieListViewModelProtocol {
-
-    var title: Driver<String> {
-        .just("Awesome Movies!!")
+    func viewDidLoad() {
+        currentSearchState.accept(MovieListSearchState(searchText: ""))
+        updateMovies(.initial)
     }
 
-    func viewDidLoad() {
+    func refreshMovies() {
         updateMovies(.initial)
     }
 
@@ -60,18 +60,16 @@ extension MovieListViewModel: MovieListViewModelProtocol {
         selectedMovieRelay
     }
 
-    private func updateMovies(_ load: Update) {
+    private func updateMovies(_ update: Update) {
         isLoading = true
-        self.repository.movies(forState: currentSearchState.value)
+        let searchState = update == .initial ? currentSearchState.value.resetingState() : currentSearchState.value
+
+        self.repository.movies(forState: searchState)
             .subscribe(onSuccess: { [weak self] resultState in
                 guard let self = self else { return }
 
-                var mergedState = resultState
-                if case .next = load {
-                    mergedState.currentMovieList = self.currentSearchState.value.currentMovieList + resultState.currentMovieList
-                }
-
-                self.currentSearchState.accept(mergedState)
+                let fullState = update == .next ? resultState.appendingMovies(from: self.currentSearchState.value) : resultState
+                self.currentSearchState.accept(fullState)
                 self.isLoading = false
             })
             .disposed(by: self.disposeBag)
