@@ -1,5 +1,5 @@
 //
-//  MovieListCodable.swift
+//  MovieList.swift
 //  Movies
 //
 //  Created by Garnik Harutyunyan on 17/10/2020.
@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct MovieListCodable: Codable {
+struct MovieList: Codable {
     let page: Int
-    let results: [MovieCodable]
+    let results: [Movie]
     let totalPages: Int
 
     private enum CodingKeys: String, CodingKey {

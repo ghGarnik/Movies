@@ -34,7 +34,7 @@ final class Coordinator {
 
     private func initialViewController() -> UIViewController {
         let service = MovieListService(apiClient: APIClient())
-        let dataProvider = DataProvider(service: service)
+        let dataProvider = MovieRepository(service: service)
 
         let movieListViewModel = MovieListViewModel(repository: dataProvider, selectedMovieRelay: didSelectMovie)
         let movieListViewController = MovieListViewController(viewModel: movieListViewModel)
@@ -47,7 +47,13 @@ final class Coordinator {
         didSelectMovie
             .subscribe(onNext: { [weak self] movie in
                 guard let self = self else { return }
-                let movieDetailViewController = MovieDetailViewController(movie: movie)
+
+                let movieDetailService = MovieDetailService(apiClient: APIClient())
+                let movieDetailRepository = MovieDetailRepository(service: movieDetailService)
+
+                let movieDetailViewModel = MovieDetailViewModel(repository: movieDetailRepository, movieId: movie.id)
+
+                let movieDetailViewController = MovieDetailViewController(viewModel: movieDetailViewModel)
                 self.navigationController?.pushViewController(movieDetailViewController, animated: true)
             })
             .disposed(by: disposeBag)

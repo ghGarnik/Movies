@@ -1,19 +1,22 @@
 //
-//  Movie.swift
+//  MovieDetail.swift
 //  Movies
 //
-//  Created by Garnik Harutyunyan on 16/10/2020.
+//  Created by Garnik Harutyunyan on 18/10/2020.
 //  Copyright © 2020 Garnik Harutyunyan. All rights reserved.
 //
 
 import Foundation
 
-struct Movie: Codable {
+struct MovieDetail: Codable {
     let id: Int
     let title: String
     let posterUrl: URL?
+    let overview: String
     let year: String
+    let genres: String
     let rate: Double
+    let budget: Double
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -21,6 +24,9 @@ struct Movie: Codable {
         case posterUrl = "poster_path"
         case year = "release_date"
         case rate = "vote_average"
+        case genres
+        case budget
+        case overview
     }
 
     init(from decoder: Decoder) throws {
@@ -36,7 +42,12 @@ struct Movie: Codable {
             posterUrl = nil
         }
 
+        overview = try values.decode(String.self, forKey: .overview)
         year = try values.decode(String.self, forKey: .year)
+
+        genres = try values.decode([Genre].self, forKey: .genres).map { $0.name }.joined(separator: ", ")
+
         rate = try values.decode(Double.self, forKey: .rate)
+        budget = try values.decode(Double.self, forKey: .budget)
     }
 }

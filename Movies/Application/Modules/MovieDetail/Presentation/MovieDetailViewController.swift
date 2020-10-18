@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 import Kingfisher
 
 final class MovieDetailViewController: UIViewController {
@@ -25,15 +27,15 @@ final class MovieDetailViewController: UIViewController {
     private var views = [String: UIView]()
     private let metrics: [String: CGFloat] = ["verticalSpacing": 16.0,
                                               "headerHeight": 300]
+    private let disposeBag = DisposeBag()
 
     //MARK: - Init
 
-    private let movie: Movie
+    private let viewModel: MovieDetailViewModelProtocol
 
-    init(movie: Movie) {
-        self.movie = movie
+    init(viewModel: MovieDetailViewModelProtocol) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        self.title = movie.title
         setupViewsDictionary()
     }
 
@@ -45,25 +47,33 @@ final class MovieDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        fillMovie()
+        setupBindings()
         setupScrollView()
         setupViewConstraints()
         applyStyle()
     }
 
-    private func fillMovie() {
-        imageHeaderView.kf.setImage(with: movie.posterUrl)
-        nameLabel.text = movie.title
-        ratingLabel.text = String(movie.rate)+(" %")
-        yearLabel.text = movie.year
-        genreLabel.text = movie.genre
+    private func setupBindings() {
+        viewModel.movieDetail
+            .drive(onNext: { [weak self] movieDetail in
+                guard let self = self else { return }
 
-        let formatter = NumberFormatter()
-        formatter.locale = Locale.current
-        formatter.numberStyle = .currency
-        budgetLabel.text = formatter.string(for: (movie.budget ?? 0.0))
+                self.title = movieDetail.title
 
-        overviewLabel.text = movie.overview
+                self.imageHeaderView.kf.setImage(with: movieDetail.posterUrl)
+                self.nameLabel.text = movieDetail.title
+                self.ratingLabel.text = String(movieDetail.rate)+(" %")
+                self.yearLabel.text = movieDetail.year
+                self.genreLabel.text = movieDetail.genres
+
+                let formatter = NumberFormatter()
+                formatter.locale = Locale.current
+                formatter.numberStyle = .currency
+                self.budgetLabel.text = formatter.string(for: movieDetail.budget)
+
+                self.overviewLabel.text = movieDetail.overview
+            })
+            .disposed(by: disposeBag)
     }
 
     //MARK: - VLF methods
@@ -181,6 +191,11 @@ final class MovieDetailViewController: UIViewController {
         genreLabel.textAlignment = .center
         genreLabel.numberOfLines = 2
         genreLabel.sizeToFit()
+
+        budgetLabel.textColor = .black
+        budgetLabel.font = .systemFont(ofSize: 16, weight: .regular)
+        budgetLabel.textAlignment = .right
+        budgetLabel.sizeToFit()
 
         overviewLabel.textColor = .black
         overviewLabel.font = .systemFont(ofSize: 16, weight: .light)

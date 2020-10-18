@@ -12,9 +12,9 @@ import RxCocoa
 
 struct MovieListViewModel {
     private let selectedMovieRelay: PublishRelay<Movie>
-    private let repository: DataProvider
+    private let repository: MovieRepository
 
-    init(repository: DataProvider, selectedMovieRelay: PublishRelay<Movie>) {
+    init(repository: MovieRepository, selectedMovieRelay: PublishRelay<Movie>) {
         self.repository = repository
         self.selectedMovieRelay = selectedMovieRelay
     }

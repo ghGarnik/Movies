@@ -17,10 +17,10 @@ struct MovieListService {
         self.apiClient = apiClient
     }
 
-    func movieList() -> Single<MovieListCodable> {
+    func movieList() -> Single<MovieList> {
         .create { observer -> Disposable in
             let apiKey = MoviesKeys().apiKey
-            let request: Single<MovieListCodable> = self.apiClient.request(url: Endpoints.topRated.url,
+            let request: Single<MovieList> = self.apiClient.request(url: Endpoints.topRated.url,
                               method: .get, parameters: ["api_key": apiKey], headers: [])
 
             let _ = request.subscribe(onSuccess: { movieListCodable in

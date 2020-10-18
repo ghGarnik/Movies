@@ -1,5 +1,5 @@
 //
-//  DataProvider.swift
+//  MovieRepository.swift
 //  Movies
 //
 //  Created by Garnik Harutyunyan on 17/10/2020.
@@ -8,7 +8,7 @@
 
 import RxSwift
 
-final class DataProvider {
+final class MovieRepository {
 
     private let service: MovieListService
 
@@ -18,8 +18,8 @@ final class DataProvider {
 
     func movies() -> Single<[Movie]> {
         service.movieList()
-            .map { movieListCodable -> [Movie] in
-                return movieListCodable.results.map { $0.toDomain() }
+            .map { movieList -> [Movie] in
+                return movieList.results
         }
     }
 }
