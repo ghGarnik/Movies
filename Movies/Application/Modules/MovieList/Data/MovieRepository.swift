@@ -9,17 +9,37 @@
 import RxSwift
 
 final class MovieRepository {
+    //MARK: - init
 
     private let service: MovieListService
 
     init(service: MovieListService) {
         self.service = service
     }
+}
 
-    func movies() -> Single<[Movie]> {
-        service.movieList()
-            .map { movieList -> [Movie] in
-                return movieList.results
+//MARK: - MovieRepositoryProtocol
+
+extension MovieRepository: MovieRepositoryProtocol {
+
+    /// Returns a new MovieListSearchState for query in state.
+    /// - Parameter state: state containing query to make.
+    /// - Returns: new state including fetched list of Movie.
+    func movies(forState state: MovieListSearchState) -> Single<MovieListSearchState> {
+        guard state.currentPage <= state.maximumPages else {
+            return Single.create { emitter -> Disposable in
+                emitter(.success(state))
+                return Disposables.create()
+            }
+        }
+
+        return service.movieList(query: state.searchText, page: state.currentPage+1)
+            .map { movieList -> MovieListSearchState in
+                var newState = MovieListSearchState(searchText: state.searchText)
+                newState.currentMovieList = movieList.results
+                newState.currentPage = movieList.page
+                newState.maximumPages = movieList.totalPages
+                return newState
         }
     }
 }

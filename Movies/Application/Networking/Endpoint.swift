@@ -10,6 +10,7 @@ import Foundation
 
 enum Endpoints {
     case topRated
+    case search
     case movie(Int)
     case genres
     case image(String)
@@ -27,6 +28,8 @@ enum Endpoints {
         switch self {
         case .topRated:
             return "/movie/top_rated"
+        case .search:
+            return "/search/movie"
         case .movie(let id):
             return "/movie/\(String(id))"
         case .genres:

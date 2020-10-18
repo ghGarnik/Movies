@@ -39,8 +39,10 @@ final class MovieListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        viewModel.viewDidLoad()
         setupTableView()
         setupViewConstraints()
+        applyStyle()
         setupBindings()
     }
 
@@ -49,6 +51,8 @@ final class MovieListViewController: UIViewController {
         movieListTableView.separatorStyle = .none
         movieListTableView.register(MovieCell.self, forCellReuseIdentifier: MovieCell.reuseIdentifier)
     }
+
+    //MARK: - RxCocoa Bindings
 
     private func setupBindings() {
         viewModel.title
@@ -61,12 +65,31 @@ final class MovieListViewController: UIViewController {
             }
             .disposed(by: disposeBag)
 
+        movieListTableView.rx.contentOffset
+            .subscribe({ [weak self] _ in
+                guard let self = self else { return }
+                guard self.shouldLoadNextPage else { return }
+                self.viewModel.loadNextPage()
+            })
+            .disposed(by: disposeBag)
+
+
         movieListTableView.rx.modelSelected(Movie.self)
             .bind(to: viewModel.didSelectMovie)
             .disposed(by: disposeBag)
     }
 
-    //MARK: - VLF methods
+    private var shouldLoadNextPage: Bool {
+        guard movieListTableView.contentSize.height > movieListTableView.frame.height else { return false }
+        
+        return  movieListTableView.contentOffset.y + movieListTableView.frame.size.height + 20.0 > movieListTableView.contentSize.height
+    }
+
+    private func applyStyle() {
+        self.view.backgroundColor = .white
+    }
+
+    //MARK: - VFL methods
 
     private func setupViewsDictionary() {
         views = ["movieListTableView": movieListTableView]
@@ -74,6 +97,7 @@ final class MovieListViewController: UIViewController {
 
     private func setupViewConstraints() {
         self.view.addSubViewWithoutConstraints(movieListTableView)
+        let safeAreaBottom = (UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.safeAreaInsets.bottom ?? 0.0)
 
         var constraints = [NSLayoutConstraint]()
 
@@ -83,7 +107,7 @@ final class MovieListViewController: UIViewController {
                                                                             views: views)
         constraints += tableViewHorizontalConstraints
 
-        let tableViewVerticalConstraints = NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[movieListTableView]-0-|",
+        let tableViewVerticalConstraints = NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[movieListTableView]-\(safeAreaBottom)-|",
                                                                           options: [],
                                                                           metrics: nil,
                                                                           views: views)

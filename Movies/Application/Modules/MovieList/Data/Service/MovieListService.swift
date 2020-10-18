@@ -11,17 +11,43 @@ import RxSwift
 import Keys
 
 struct MovieListService {
+    //MARK: - Init
+    
     private let apiClient: APIClient
 
     init(apiClient: APIClient) {
         self.apiClient = apiClient
     }
+}
 
-    func movieList() -> Single<MovieList> {
+//MARK: - MovieListServiceProtocol
+
+extension MovieListService: MovieListServiceProtocol {
+
+    /// Returns MovieList for parameters.
+    /// - Parameters:
+    ///   - query: Film name query.
+    ///   - page: Page to retrieve
+    /// - Returns: MovieList  Single.
+    func movieList(query: String, page: Int) -> Single<MovieList> {
         .create { observer -> Disposable in
             let apiKey = MoviesKeys().apiKey
-            let request: Single<MovieList> = self.apiClient.request(url: Endpoints.topRated.url,
-                              method: .get, parameters: ["api_key": apiKey], headers: [])
+            let url: URL
+            var parameters = ["api_key": apiKey,
+                              "page": String(page)]
+
+            if query.isEmpty {
+                url = Endpoints.topRated.url
+            } else {
+                url = Endpoints.search.url
+                parameters["query"] = query
+            }
+
+
+            let request: Single<MovieList> = self.apiClient.request(url: url,
+                                                                    method: .get,
+                                                                    parameters: parameters,
+                                                                    headers: [])
 
             let _ = request.subscribe(onSuccess: { movieListCodable in
                 observer(.success(movieListCodable))
