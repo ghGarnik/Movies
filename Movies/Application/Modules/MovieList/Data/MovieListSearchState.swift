@@ -25,6 +25,12 @@ struct MovieListSearchState {
         state.maximumPages = 1
         return state
     }
+
+    func withQuery(_ searchText: String) -> MovieListSearchState {
+        var newState = self
+        newState.searchText = searchText
+        return newState
+    }
     
     func appendingMovies(from state: MovieListSearchState) -> MovieListSearchState {
         var newState = self

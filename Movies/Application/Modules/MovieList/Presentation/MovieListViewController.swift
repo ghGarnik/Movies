@@ -14,6 +14,7 @@ final class MovieListViewController: UIViewController {
     //MARK: - Subviews
 
     private let movieListTableView = UITableView()
+    private var searchController = UISearchController()
 
     private var views = [String: UIView]()
 
@@ -39,11 +40,23 @@ final class MovieListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel.viewDidLoad()
         setupTableView()
+        setupSearchController()
         setupViewConstraints()
         applyStyle()
         setupBindings()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        searchController.searchBar.isHidden = false
+        searchController.searchBar.endEditing(false)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        searchController.searchBar.isHidden = true
+        searchController.searchBar.endEditing(true)
     }
 
     private func setupTableView() {
@@ -58,6 +71,15 @@ final class MovieListViewController: UIViewController {
         movieListTableView.refreshControl = refreshControl
     }
 
+    private func setupSearchController() {
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.showsCancelButton = false
+        searchController.searchBar.searchTextField.placeholder = "Tip here to get awesome movies"
+        movieListTableView.tableHeaderView = searchController.searchBar
+        movieListTableView.keyboardDismissMode = .onDrag
+    }
+
     @objc private func refreshTable() {
         viewModel.refreshMovies()
     }
@@ -70,6 +92,15 @@ final class MovieListViewController: UIViewController {
             .drive(movieListTableView.rx.items(cellIdentifier: MovieCell.reuseIdentifier, cellType: MovieCell.self)) {_, movie, cell in
                 cell.configureCell(movie: movie)
             }
+            .disposed(by: disposeBag)
+
+        searchController.searchBar.rx.text.orEmpty
+            .debounce(.microseconds(500), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+            .subscribe (onNext: { [weak self] query in
+                guard let self = self else { return }
+                self.viewModel.searchMovie(searchQuery: query)
+            })
             .disposed(by: disposeBag)
 
         movieListTableView.rx.contentOffset

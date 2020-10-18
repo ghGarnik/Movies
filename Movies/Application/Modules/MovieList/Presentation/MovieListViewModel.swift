@@ -32,12 +32,17 @@ class MovieListViewModel {
 }
 
 extension MovieListViewModel: MovieListViewModelProtocol {
-    func viewDidLoad() {
-        currentSearchState.accept(MovieListSearchState(searchText: ""))
+    func refreshMovies() {
+        currentSearchState.accept(currentSearchState.value.resetingState().withQuery(""))
         updateMovies(.initial)
     }
 
-    func refreshMovies() {
+    func searchMovie(searchQuery: String) {
+        let searchState = currentSearchState.value
+        .resetingState()
+        .withQuery(searchQuery)
+
+        currentSearchState.accept(searchState)
         updateMovies(.initial)
     }
 
