@@ -18,7 +18,7 @@ class MovieListViewModel {
         case next
     }
 
-    private let currentSearchState = BehaviorRelay<MovieListSearchState>(value: MovieListSearchState(searchText: ""))
+    private let currentSearchState = BehaviorRelay<MovieListSearchState>(value: MovieListSearchState.empty())
     private let disposeBag = DisposeBag()
     private var isLoading = false
 

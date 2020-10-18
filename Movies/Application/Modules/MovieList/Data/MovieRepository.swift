@@ -35,11 +35,9 @@ extension MovieRepository: MovieRepositoryProtocol {
 
         return service.movieList(query: state.searchText, page: state.currentPage+1)
             .map { movieList -> MovieListSearchState in
-                var newState = MovieListSearchState(searchText: state.searchText)
-                newState.currentMovieList = movieList.results
-                newState.currentPage = movieList.page
-                newState.maximumPages = movieList.totalPages
-                return newState
+                return MovieListSearchState(currentMovieList: movieList.results,
+                                            searchText: state.searchText,
+                                            currentPage: movieList.page, maximumPages: movieList.totalPages)
         }
     }
 }

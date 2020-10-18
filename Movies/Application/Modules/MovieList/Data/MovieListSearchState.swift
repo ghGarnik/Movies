@@ -9,32 +9,39 @@
 import Foundation
 
 struct MovieListSearchState {
-    var currentMovieList = [Movie]()
-    var searchText: String
-    var currentPage: Int = 0
-    var maximumPages: Int = 1
-    
-    init(searchText: String) {
-        self.searchText = searchText
-    }
-    
+    let currentMovieList: [Movie]
+    let searchText: String
+    let currentPage: Int
+    let maximumPages: Int
+
+
+    // These functions makes possible to keep the object immutable.
     func resetingState() -> MovieListSearchState {
-        var state = self
-        state.currentMovieList = []
-        state.currentPage = 0
-        state.maximumPages = 1
-        return state
+        return MovieListSearchState(currentMovieList: [],
+                                    searchText: self.searchText,
+                                    currentPage: 0,
+                                    maximumPages: 1)
     }
 
     func withQuery(_ searchText: String) -> MovieListSearchState {
-        var newState = self
-        newState.searchText = searchText
-        return newState
+        return MovieListSearchState(currentMovieList: self.currentMovieList,
+                                    searchText: searchText,
+                                    currentPage: self.currentPage,
+                                    maximumPages: self.maximumPages)
     }
     
     func appendingMovies(from state: MovieListSearchState) -> MovieListSearchState {
-        var newState = self
-        newState.currentMovieList = state.currentMovieList + self.currentMovieList
-        return newState
+        let movies = state.currentMovieList + self.currentMovieList
+        return MovieListSearchState(currentMovieList: movies,
+                                    searchText: self.searchText,
+                                    currentPage: self.currentPage,
+                                    maximumPages: self.maximumPages)
+    }
+
+    static func empty() -> MovieListSearchState {
+        return MovieListSearchState(currentMovieList: [],
+                                    searchText: "",
+                                    currentPage: 0,
+                                    maximumPages: 1)
     }
 }
