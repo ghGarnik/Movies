@@ -142,7 +142,6 @@
 			isa = PBXGroup;
 			children = (
 				C9174AFE25388D4A005DA89B /* Coordinator.swift */,
-				C965AFA6253B661200762F7D /* Initial */,
 				C9F117DC2539F82400F8BC19 /* MovieDetail */,
 				C9174B01253891A4005DA89B /* MovieList */,
 			);
@@ -215,30 +214,6 @@
 			path = Networking;
 			sourceTree = "<group>";
 		};
-		C965AFA6253B661200762F7D /* Initial */ = {
-			isa = PBXGroup;
-			children = (
-				C965AFA7253B661E00762F7D /* Genres */,
-			);
-			path = Initial;
-			sourceTree = "<group>";
-		};
-		C965AFA7253B661E00762F7D /* Genres */ = {
-			isa = PBXGroup;
-			children = (
-				C965AFA8253B662500762F7D /* Domain */,
-			);
-			path = Genres;
-			sourceTree = "<group>";
-		};
-		C965AFA8253B662500762F7D /* Domain */ = {
-			isa = PBXGroup;
-			children = (
-				C965AFAA253B663D00762F7D /* Genre.swift */,
-			);
-			path = Domain;
-			sourceTree = "<group>";
-		};
 		C965AFB1253B6A0900762F7D /* Service */ = {
 			isa = PBXGroup;
 			children = (
@@ -288,6 +263,7 @@
 		C9F117DF2539F83A00F8BC19 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				C965AFAA253B663D00762F7D /* Genre.swift */,
 				C9E13E6D253C23A700CEAB90 /* MovieDetail.swift */,
 			);
 			path = Domain;
