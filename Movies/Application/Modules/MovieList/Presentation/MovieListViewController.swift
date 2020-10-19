@@ -14,7 +14,7 @@ final class MovieListViewController: UIViewController {
     //MARK: - Subviews
 
     private let movieListTableView = UITableView()
-    private var searchController = UISearchController()
+    private let searchController = UISearchController()
 
     private var views = [String: UIView]()
 
@@ -47,22 +47,11 @@ final class MovieListViewController: UIViewController {
         setupBindings()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        searchController.searchBar.isHidden = false
-        searchController.searchBar.endEditing(false)
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        searchController.searchBar.isHidden = true
-        searchController.searchBar.endEditing(true)
-    }
-
     private func setupTableView() {
         movieListTableView.rowHeight = 200.0
         movieListTableView.separatorStyle = .none
         movieListTableView.register(MovieCell.self, forCellReuseIdentifier: MovieCell.reuseIdentifier)
+        movieListTableView.keyboardDismissMode = .onDrag
 
         let refreshControl = UIRefreshControl()
         refreshControl.attributedTitle = NSAttributedString(string: "Refreshing awesome movies")
@@ -76,11 +65,11 @@ final class MovieListViewController: UIViewController {
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.searchBar.showsCancelButton = false
         searchController.searchBar.searchTextField.placeholder = "Tip here to get awesome movies"
-        movieListTableView.tableHeaderView = searchController.searchBar
-        movieListTableView.keyboardDismissMode = .onDrag
+        self.navigationController?.navigationBar.topItem?.titleView = searchController.searchBar
     }
 
     @objc private func refreshTable() {
+        searchController.searchBar.searchTextField.text = ""
         viewModel.refreshMovies()
     }
 
@@ -130,7 +119,8 @@ final class MovieListViewController: UIViewController {
     //MARK: - VFL methods
 
     private func setupViewsDictionary() {
-        views = ["movieListTableView": movieListTableView]
+        views = ["movieListTableView": movieListTableView,
+                 "searchBar": searchController.searchBar]
     }
 
     private func setupViewConstraints() {
